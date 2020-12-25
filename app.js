@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 
 const blogRoutes = require('./api/routes/blogs');
+const userRoutes = require('./api/routes/users');
 
 mongoose.connect('mongodb+srv://hackerakhil:' + process.env.MONGO_ATLAS_PW +'@cluster0.3ybkn.mongodb.net/<dbname>?retryWrites=true&w=majority',
    {
@@ -36,6 +37,7 @@ app.use((res,req,next) => {
 
 //Routes which will handle my request
 app.use('/blogs', blogRoutes);
+app.use('/users',userRoutes);
 
 app.use((req,res,next) => {
     const error = new Error('Not Found');

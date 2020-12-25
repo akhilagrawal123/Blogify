@@ -34,17 +34,17 @@ const upload = multer({storage: storage,
 });
 
 const Blog = require('../models/Blog');
+const User = require('../models/User');
 
 router.get('/', (req, res, next) => {
        Blog.find()
-       .select("comment content author created title image category subCategory _id")
+       .select("content author created title image category subCategory _id")
        .exec()
        .then(docs => {
            const response = {
                count: docs.length,
                blogs: docs.map(doc => {
                    return {
-                       comment: doc.comment,
                        subCategory: doc.subCategory,
                        title: doc.title,
                        author: doc.author,
@@ -102,7 +102,7 @@ router.post('/', upload.single('image'), (req, res, next) => {
 router.get('/:category', (req, res, next) => {
     const category = req.params.category;
     Blog.find({category: category})
-    .select("comment content author created title image category subCategory _id")
+    .select("content author created title image category subCategory _id")
     .exec()
     .then(doc => {
        console.log("From Database", doc);
@@ -129,7 +129,7 @@ router.get('/id/:blogId', (req, res, next) => {
     const id = req.params.blogId;
 
     Blog.findById(id)
-    .select("comment content author created title image category subCategory _id")
+    .select("content author created title image category subCategory _id")
     .exec()
     .then(doc => {
        console.log("From Database", doc);
@@ -137,6 +137,105 @@ router.get('/id/:blogId', (req, res, next) => {
        {
            res.status(200).json({
                blog: doc
+           });
+       }
+       else
+       {
+           res.status(404).json({
+               message: "No blog found for this category"
+           });
+       }
+    })
+    .catch(err => {
+        console.log(err);
+        res.status(500).json({error: err});
+    });      
+});
+
+router.get('/personalised/:userId', (req, res, next) => {
+    const id = req.params.userId;
+
+    User.findById(id)
+    .select("interests")
+    .exec()
+    .then(async doc => {
+       console.log("From Database", doc);
+       if(doc)
+       {
+            const interests = doc.interests
+            /*var vals = []
+            for(i=0;i<interests.length;i++)
+            {
+                const subCategory = interests[i];
+                const blogs = await Blog.find({subCategories:subCategory})
+                vals = vals.concat(blogs)
+            }*/
+            const blogs = await Blog.find({subCategories:{$in:interests}})
+           res.status(200).json({
+               blogs:blogs
+           });
+       }
+       else
+       {
+           res.status(404).json({
+               message: "No blog found for this category"
+           });
+       }
+    })
+    .catch(err => {
+        console.log(err);
+        res.status(500).json({error: err});
+    });      
+});
+
+
+router.get('/bookmarks/:userId', (req, res, next) => {
+    const id = req.params.userId;
+
+    User.findById(id)
+    .select("bookmarks")
+    .exec()
+    .then(async doc => {
+       console.log("From Database", doc);
+       if(doc)
+       {
+            const bookmarks = doc.bookmarks
+            /*var vals = []
+            for(i=0;i<interests.length;i++)
+            {
+                const subCategory = interests[i];
+                const blogs = await Blog.find({subCategories:subCategory})
+                vals = vals.concat(blogs)
+            }*/
+            const blogs = await Blog.find({_id:{$in:bookmarks}})
+           res.status(200).json({
+               blogs:blogs
+           });
+       }
+       else
+       {
+           res.status(404).json({
+               message: "No blog found for this category"
+           });
+       }
+    })
+    .catch(err => {
+        console.log(err);
+        res.status(500).json({error: err});
+    });      
+});
+
+router.get('/myBlogs/:userId', (req, res, next) => {
+    const userId = req.params.userId;
+    Blog.find({author: userId})
+    .select("content author created title image category subCategory _id")
+    .exec()
+    .then(doc => {
+       console.log("From Database", doc);
+       if(doc)
+       {
+           res.status(200).json({
+               blog: doc,
            });
        }
        else
