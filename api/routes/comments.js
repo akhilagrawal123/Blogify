@@ -7,8 +7,9 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const Blog = require("../models/Blog");
 const Comment = require("../models/Comment");
+const checkAuth = require("../middleware/check-auth");
 
-router.post("/:blogId", (req, res, next) => {
+router.post("/:blogId", checkAuth, (req, res, next) => {
   const id = req.params.blogId;
 
   const commentOps = {};
@@ -26,7 +27,7 @@ router.post("/:blogId", (req, res, next) => {
     .save()
     .then((result) => {
       console.log(result);
-      Blog.update({ _id: id }, { $push: { comments: comment._id } }, done).then(
+      Blog.update({ _id: id }, { $push: { comments: comment._id } }).then(
         (result) => {
           res.status(200).json({
             message: "Added comment Successfully",
@@ -42,11 +43,42 @@ router.post("/:blogId", (req, res, next) => {
     });
 });
 
-router.get("/:blogId", (req, res, next) => {
+router.post("/reply/:commentId", checkAuth, (req, res, next) => {
+  const id = req.params.commentId;
+
+  const replyOps = {};
+  for (const ops of Object.keys(req.body)) {
+    replyOps[ops] = req.body[ops];
+  }
+  Comment.update({ _id: id }, { $push: { replies: replyOps } })
+    .then((result) => {
+      res.status(200).json({
+        message: "Added Reply Successfully",
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json({ error: err });
+    });
+
+  // comment
+  //   .save()
+  //   .then((result) => {
+  //     console.log(result);
+  //   })
+  //   .catch((err) => {
+  //     console.log(err);
+  //     res.status(500).json({
+  //       error: err,
+  //     });
+  //   });
+});
+
+router.get("/:blogId", checkAuth, (req, res, next) => {
   const id = req.params.blogId;
 
   Blog.findById(id)
-    .select("comment")
+    .select("comments")
     .exec()
     .then(async (doc) => {
       console.log("From Database", doc);

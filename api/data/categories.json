@@ -1,39 +1,53 @@
 [
-    {
-        "name": "Coding/\nDev",
-         "subCategories": [
-              "ML","Android","WebD","Cyber Security","Competitive", "CodeISM"
-         ]   
-    },
-    {
-        "name": "Placements",
-        "subCategories": [
-            "Internships","Interviews","Core","Coding Round"
-        ]     
-    },
-    {
-        "name": "Hostel",
-        "subCategories": [
-            "Rooms","Mess","Jasper","Amber","Sapphire","Diamond","Rosaline"
-        ]     
-    },
-    {
-        "name": "Clubs",
-        "subCategories": [
-            "Recruitment","Time Management","Technical","Cultural","Sports"
-        ]     
-    },
-    {
-        "name": "Academics",
-        "subCategories": [
-            "Gpa","Hard Sem","Easy Sem","Branch","Branch Change"
-        ]     
-    },
-    {
-        "name": "Miscellaneous",
-        "subCategories": [
-            "Leisure","Library","Administration","Seniors","Scholarships"
-        ]     
-    }
-
+  {
+    "name": "Coding-Dev",
+    "subCategories": [
+      "ML",
+      "Android",
+      "WebD",
+      "Cyber Security",
+      "Competitive",
+      "CodeISM"
+    ]
+  },
+  {
+    "name": "Placements",
+    "subCategories": ["Internships", "Interviews", "Core", "Coding Round"]
+  },
+  {
+    "name": "Hostel",
+    "subCategories": [
+      "Rooms",
+      "Mess",
+      "Jasper",
+      "Amber",
+      "Sapphire",
+      "Diamond",
+      "Rosaline"
+    ]
+  },
+  {
+    "name": "Clubs",
+    "subCategories": [
+      "Recruitment",
+      "Time Management",
+      "Technical",
+      "Cultural",
+      "Sports"
+    ]
+  },
+  {
+    "name": "Academics",
+    "subCategories": ["Gpa", "Hard Sem", "Easy Sem", "Branch", "Branch Change"]
+  },
+  {
+    "name": "Miscellaneous",
+    "subCategories": [
+      "Leisure",
+      "Library",
+      "Administration",
+      "Seniors",
+      "Scholarships"
+    ]
+  }
 ]
