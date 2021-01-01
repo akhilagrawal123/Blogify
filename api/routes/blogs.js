@@ -79,14 +79,6 @@ router.post("/", checkAuth, upload.single("image"), (req, res, next) => {
       console.log(result);
       res.status(200).json({
         message: "Created Blog Successfully",
-        createdBlog: {
-          _id: result._id,
-          title: result.title,
-          author: result.author,
-          category: result.category,
-          content: result.content,
-          subCategory: result.subCategory,
-        },
       });
     })
     .catch((err) => {
@@ -113,7 +105,7 @@ router.get("/:category", checkAuth, (req, res, next) => {
       if (doc) {
         res.status(200).json({
           subCategories: subcat,
-          blog: doc,
+          blogs: doc,
         });
       } else {
         res.status(404).json({
@@ -233,7 +225,7 @@ router.get("/myBlogs/:userId", checkAuth, (req, res, next) => {
       console.log("From Database", doc);
       if (doc) {
         res.status(200).json({
-          blog: doc,
+          blogs: doc,
         });
       } else {
         res.status(404).json({

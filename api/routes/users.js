@@ -47,6 +47,8 @@ router.post("/signup", (req, res, next) => {
 });
 
 router.post("/login", (req, res, next) => {
+  console.log(req.body.email);
+  console.log(req.body.password);
   User.find({ email: req.body.email })
     .exec()
     .then((user) => {
@@ -73,9 +75,11 @@ router.post("/login", (req, res, next) => {
             }
           );
           return res.status(200).json({
+            //  console.log(user[0].profileCompleted);
             message: "Auth Successfull",
             token: token,
             id: user[0]._id,
+            profileCompleted: user[0].profileCompleted,
           });
         }
 
