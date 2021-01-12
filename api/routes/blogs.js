@@ -35,7 +35,9 @@ const Categories = require("../data/categories.json");
 
 router.get("/", (req, res, next) => {
   Blog.find()
-    .select("content author created title image category subCategory _id")
+    .select(
+      "content author created title image category subCategory _id handle"
+    )
     .exec()
     .then((docs) => {
       const response = {
@@ -61,15 +63,16 @@ router.get("/", (req, res, next) => {
     });
 });
 
-router.post("/", checkAuth, upload.single("image"), (req, res, next) => {
+router.post("/", checkAuth, (req, res, next) => {
   console.log(req.file);
   const blog = new Blog({
     _id: new mongoose.Types.ObjectId(),
     title: req.body.title,
     author: req.body.author,
+    handle: req.body.handle,
     category: req.body.category,
     content: req.body.content,
-    image: req.file.path,
+    image: "",
     subCategory: req.body.subCategory,
   });
 
@@ -98,7 +101,9 @@ router.get("/:category", checkAuth, (req, res, next) => {
     }
   }
   Blog.find({ category: category })
-    .select("content author created title image category subCategory _id")
+    .select(
+      "content author created title image category subCategory _id handle"
+    )
     .exec()
     .then((doc) => {
       console.log("From Database", doc);
@@ -119,18 +124,53 @@ router.get("/:category", checkAuth, (req, res, next) => {
     });
 });
 
-router.get("/id/:blogId", checkAuth, (req, res, next) => {
+router.get("/id/:blogId/:userId", checkAuth, (req, res, next) => {
   const id = req.params.blogId;
-
+  const userId = req.params.userId;
   Blog.findById(id)
-    .select("content author created title image category subCategory _id")
+    .select(
+      "content author created title image category subCategory _id handle"
+    )
     .exec()
     .then((doc) => {
       console.log("From Database", doc);
       if (doc) {
-        res.status(200).json({
-          blog: doc,
-        });
+        User.findById(userId)
+          .select("bookmarks")
+          .exec()
+          .then((doc2) => {
+            console.log("From Database", doc2);
+            if (doc2) {
+              var temp = doc2.bookmarks.filter((item) => {
+                return item == id;
+              });
+              var bookmarkStatus = false;
+              var obj = {
+                content: doc.content,
+                author: doc.author,
+                created: doc.created,
+                title: doc.title,
+                image: doc.image,
+                category: doc.category,
+                subCategory: doc.subCategory,
+                _id: doc._id,
+                handle: doc.handle,
+              };
+              if (temp.length == 0) {
+                obj["bookmarkStatus"] = false;
+              } else {
+                obj["bookmarkStatus"] = true;
+              }
+              console.log("finalBlog", obj);
+              res.status(200).json({
+                blog: obj,
+              });
+            } else {
+              res.status(404).json({
+                message: "No User Found",
+              });
+            }
+          });
       } else {
         res.status(404).json({
           message: "No blog found for this category",
@@ -154,18 +194,13 @@ router.get("/personalised/:userId", checkAuth, (req, res, next) => {
       if (doc) {
         const interests = doc.interests;
         console.log(interests);
-        /*var vals = []
-            for(i=0;i<interests.length;i++)
-            {
-                const subCategory = interests[i];
-                const blogs = await Blog.find({subCategories:subCategory})
-                vals = vals.concat(blogs)
-            }*/
+
         const blogs = await Blog.find({
           subCategory: { $in: interests },
         }).select(
-          "content author created title image category subCategory _id"
+          "content author created title image category subCategory _id handle"
         );
+        console.log(blogs);
         res.status(200).json({
           blogs: blogs,
         });
@@ -191,16 +226,11 @@ router.get("/bookmarks/:userId", checkAuth, (req, res, next) => {
       console.log("From Database", doc);
       if (doc) {
         const bookmarks = doc.bookmarks;
-        /*var vals = []
-            for(i=0;i<interests.length;i++)
-            {
-                const subCategory = interests[i];
-                const blogs = await Blog.find({subCategories:subCategory})
-                vals = vals.concat(blogs)
-            }*/
+
         const blogs = await Blog.find({ _id: { $in: bookmarks } }).select(
-          "content author created title image category subCategory _id"
+          "content author created title image category subCategory _id handle"
         );
+        console.log(blogs);
         res.status(200).json({
           blogs: blogs,
         });
@@ -219,7 +249,9 @@ router.get("/bookmarks/:userId", checkAuth, (req, res, next) => {
 router.get("/myBlogs/:userId", checkAuth, (req, res, next) => {
   const userId = req.params.userId;
   Blog.find({ author: userId })
-    .select("content author created title image category subCategory _id")
+    .select(
+      "content author created title image category subCategory _id handle"
+    )
     .exec()
     .then((doc) => {
       console.log("From Database", doc);
@@ -247,7 +279,10 @@ router.get("/createBlog/:category", checkAuth, (req, res, next) => {
       subcat = Categories[i].subCategories;
     }
   }
+
   if (subcat != null) {
+    console.log(subcat);
+
     res.status(200).json({
       subCategories: subcat,
     });

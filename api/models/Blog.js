@@ -13,6 +13,7 @@ const blogSchema = new mongoose.Schema({
   content: String,
   created: { type: Date, default: Date.now() },
   author: { type: mongoose.Schema.Types.ObjectId },
+  handle: { type: String },
   category: { type: String, required: true },
   subCategory: [
     {

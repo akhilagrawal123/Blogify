@@ -133,7 +133,7 @@ router.get("/:userId", checkAuth, (req, res, next) => {
   const id = req.params.userId;
 
   User.findById(id)
-    .select("name yearOfGraduation branch bio bookmarks interests")
+    .select("name yearOfGraduation branch bio bookmarks interests handle")
     .exec()
     .then((doc) => {
       console.log("From Database", doc);
@@ -173,13 +173,40 @@ router.patch("/addBookmarks/:userId", checkAuth, (req, res, next) => {
     updateOps[ops] = req.body[ops];
   }
 
-  User.update({ _id: id }, { $push: { bookmarks: updateOps.blogId } })
+  User.findById(id)
+    .select("bookmarks")
     .exec()
-    .then((result) => {
-      console.log(updateOps);
-      res.status(200).json({
-        message: "User Bookmarks Updated",
-      });
+    .then((doc) => {
+      console.log("From Database", doc);
+      if (doc) {
+        var list = doc.bookmarks;
+        var newList = list;
+        if (updateOps.newStatus === true) {
+          var temp = list.filter((item) => {
+            return item == updateOps.blogId;
+          });
+          if (temp.length == 0) {
+            newList.push(updateOps.blogId);
+          }
+        } else {
+          newList = list.filter((item) => {
+            return updateOps.blogId != item;
+          });
+        }
+
+        User.update({ _id: id }, { $set: { bookmarks: newList } })
+          .exec()
+          .then((result) => {
+            console.log(updateOps);
+            res.status(200).json({
+              message: "User Bookmarks Updated",
+            });
+          });
+      } else {
+        res.status(404).json({
+          message: "No User Found",
+        });
+      }
     })
     .catch((err) => {
       console.log(err);
