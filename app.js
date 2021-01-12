@@ -13,7 +13,8 @@ mongoose.connect(
     process.env.MONGO_ATLAS_PW +
     "@cluster0.3ybkn.mongodb.net/<dbname>?retryWrites=true&w=majority",
   {
-    useMongoClient: true,
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
   }
 );
 //mongodb+srv://hackerakhil:<password>@cluster0.3ybkn.mongodb.net/<dbname>?retryWrites=true&w=majority
